@@ -9,13 +9,10 @@ load_dotenv()
 # Inicializar Firebase Admin solo una vez
 if not firebase_admin._apps:
     firebase_creds = os.getenv("FIREBASE_CREDENTIALS")
-    # print(firebase_creds)
     if firebase_creds:
         cred_dict = json.loads(firebase_creds)
         cred = credentials.Certificate(cred_dict)
         firebase_admin.initialize_app(cred)
-    # cred = credentials.Certificate("creds.json")  # asegúrate de tener este archivo
-    # firebase_admin.initialize_app(cred)
 
 def verify_token(id_token: str):
     """
