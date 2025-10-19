@@ -3,7 +3,8 @@ import uvicorn
 from fastapi import Request, HTTPException
 from firebase_adm import auth
 
-from google.cloud.firestore_v1 import AsyncClient
+# from google.cloud.firestore_v1 import AsyncClient
+from firebase_adm import get_firestore_client
 from google.cloud.firestore_v1 import SERVER_TIMESTAMP
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
@@ -20,7 +21,7 @@ app.add_middleware(
     allow_methods=["*"],             # Permite todos los métodos (GET, POST, etc.)
     allow_headers=["*"],             # Permite todos los headers
 )
-db = AsyncClient()
+db = get_firestore_client()
 
 
 @app.get("/", tags=["health"])

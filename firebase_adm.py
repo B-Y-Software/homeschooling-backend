@@ -1,18 +1,32 @@
 # app/firebase_admin.py
 
 import firebase_admin
-from firebase_admin import credentials, auth
+from firebase_admin import auth
 import os
 import json
+from google.oauth2 import service_account
+from google.cloud.firestore_v1 import AsyncClient
 from dotenv import load_dotenv
 load_dotenv()
+
 # Inicializar Firebase Admin solo una vez
-if not firebase_admin._apps:
+
+def get_credentials():
+    """
+    Devuelve las credenciales de Firebase Admin.
+    """
     firebase_creds = os.getenv("FIREBASE_CREDENTIALS")
+    print(f"{firebase_creds=}")
     if firebase_creds:
         cred_dict = json.loads(firebase_creds)
-        cred = credentials.Certificate(cred_dict)
-        firebase_admin.initialize_app(cred)
+        credentials = service_account.Credentials.from_service_account_info(cred_dict)
+        return credentials
+    return None
+if not firebase_admin._apps:
+    print("=======Init firebase app =====")
+    credentials = get_credentials()
+    if credentials:
+        firebase_admin.initialize_app(credentials)
 
 def verify_token(id_token: str):
     """
@@ -24,3 +38,14 @@ def verify_token(id_token: str):
         return decoded_token  # contiene: uid, email, name, etc.
     except Exception as e:
         raise ValueError(f"Token inválido: {e}")
+
+def get_firestore_client() -> AsyncClient:
+    """
+    Devuelve una instancia del cliente Firestore.
+    """
+    credentials = get_credentials()
+    
+    return AsyncClient(credentials=credentials, project=credentials.project_id)
+
+
+
