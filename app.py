@@ -1,10 +1,8 @@
 from fastapi import FastAPI
 import uvicorn
-from fastapi import Request, HTTPException
-from firebase_admin import auth
+from fastapi import HTTPException
 
-# from google.cloud.firestore_v1 import AsyncClient
-from firebase_adm import init_firebase_admin, verify_token
+from firebase_adm import init_firebase_admin, verify_token, get_firestore_client
 from google.cloud.firestore_v1 import SERVER_TIMESTAMP
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
@@ -12,17 +10,18 @@ from dotenv import load_dotenv
 load_dotenv()
 app = FastAPI(title="Homeschooling API", description="Homeschooling API", version="0.0.1")
 origins = [
-    "*",  # Tu frontend en desarrollo
+    "*",
 ]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,           # O ["*"] para permitir todo (no recomendado en producción)
+    allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"],             # Permite todos los métodos (GET, POST, etc.)
-    allow_headers=["*"],             # Permite todos los headers
+    allow_methods=["*"],
+    allow_headers=["*"]
 )
-# init_firebase_admin()
-db = init_firebase_admin()
+init_firebase_admin()
+db = get_firestore_client()
+
 
 
 @app.get("/", tags=["health"])
