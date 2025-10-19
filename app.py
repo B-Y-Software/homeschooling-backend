@@ -1,10 +1,10 @@
 from fastapi import FastAPI
 import uvicorn
 from fastapi import Request, HTTPException
-from firebase_adm import auth
+from firebase_admin import auth
 
 # from google.cloud.firestore_v1 import AsyncClient
-from firebase_adm import get_firestore_client
+from firebase_adm import init_firebase_admin, verify_token
 from google.cloud.firestore_v1 import SERVER_TIMESTAMP
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
@@ -21,7 +21,8 @@ app.add_middleware(
     allow_methods=["*"],             # Permite todos los métodos (GET, POST, etc.)
     allow_headers=["*"],             # Permite todos los headers
 )
-db = get_firestore_client()
+# init_firebase_admin()
+db = init_firebase_admin()
 
 
 @app.get("/", tags=["health"])
@@ -43,7 +44,7 @@ async def login(login_request:LoginRequest):
     if not id_token:
         raise HTTPException(status_code=400, detail="token required")
     try:
-        decoded_token = auth.verify_id_token(id_token)
+        decoded_token = verify_token(id_token)
         print(decoded_token)
     except Exception as e:
         raise HTTPException(status_code=401, detail=f"Invalid token: {str(e)}")

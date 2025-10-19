@@ -16,18 +16,21 @@ def get_credentials():
     Devuelve las credenciales de Firebase Admin.
     """
     firebase_creds = os.getenv("FIREBASE_CREDENTIALS")
-    print(f"{firebase_creds=}")
     if firebase_creds:
         cred_dict = json.loads(firebase_creds)
         credentials = service_account.Credentials.from_service_account_info(cred_dict)
         return credentials
     return None
-if not firebase_admin._apps:
-    print("=======Init firebase app =====")
-    credentials = get_credentials()
-    if credentials:
-        firebase_admin.initialize_app(credentials)
-
+def init_firebase_admin():
+    """
+    Inicializa la aplicación Firebase Admin si no está ya inicializada.
+    y devuelve una instancia del cliente Firestore.
+    """
+    if not firebase_admin._apps:
+        credentials = get_credentials()
+        if credentials:
+            firebase_admin.initialize_app(credentials)
+            return AsyncClient(credentials=credentials, project=credentials.project_id)
 def verify_token(id_token: str):
     """
     Verifica un Firebase ID Token y devuelve la información del usuario.
@@ -39,13 +42,13 @@ def verify_token(id_token: str):
     except Exception as e:
         raise ValueError(f"Token inválido: {e}")
 
-def get_firestore_client() -> AsyncClient:
-    """
-    Devuelve una instancia del cliente Firestore.
-    """
-    credentials = get_credentials()
+# def get_firestore_client() -> AsyncClient:
+#     """
+#     Devuelve una instancia del cliente Firestore.
+#     """
+#     credentials = get_credentials()
     
-    return AsyncClient(credentials=credentials, project=credentials.project_id)
+#     return AsyncClient(credentials=credentials, project=credentials.project_id)
 
 
 
