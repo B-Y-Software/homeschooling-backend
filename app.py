@@ -66,6 +66,8 @@ async def login(login_request:LoginRequest):
             }
             await tutor_ref.set(tutor_dict)
             print(f"🆕 Authenticated {email}")
+            tutor_doc = await tutor_ref.get()
+
         else:
             print(f"✅ User {email} already exists")
         tutor_dict = tutor_doc.to_dict()
